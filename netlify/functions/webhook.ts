@@ -1,23 +1,26 @@
-require('dotenv').config();
+require('dotenv').config(); // Charger les variables d'environnement du fichier .env
 
 import type { Handler } from '@netlify/functions';
 import { aiService } from '../../src/services/aiService';
 import { whatsappService } from '../../src/services/whatsappService';
 
-// Configuration pour les fonctions
+// Charger les configurations à partir des variables d'environnement
 const config = {
   openai: {
-    apiKey: process.env.VITE_OPENAI_API_KEY || '',
+    apiKey: process.env.VITE_OPENAI_API_KEY, // Utiliser process.env au lieu de import.meta.env
   },
   airtable: {
-    apiKey: process.env.VITE_AIRTABLE_API_KEY || '',
-    baseId: process.env.VITE_AIRTABLE_BASE_ID || '',
+    apiKey: process.env.VITE_AIRTABLE_API_KEY,
+    baseId: process.env.VITE_AIRTABLE_BASE_ID,
   },
   make: {
-    webhookUrl: process.env.VITE_MAKE_WEBHOOK_URL || '',
-    webhookSecret: process.env.MAKE_WEBHOOK_SECRET || '',
+    webhookUrl: process.env.VITE_MAKE_WEBHOOK_URL,
+    webhookSecret: process.env.MAKE_WEBHOOK_SECRET,
   },
 };
+
+// Log des variables pour le débogage
+console.log('VITE_OPENAI_API_KEY:', process.env.VITE_OPENAI_API_KEY);
 
 export const handler: Handler = async (event) => {
   // Autoriser CORS
@@ -27,18 +30,18 @@ export const handler: Handler = async (event) => {
       headers: {
         'Access-Control-Allow-Origin': '*',
         'Access-Control-Allow-Headers': 'Content-Type',
-        'Access-Control-Allow-Methods': 'POST, OPTIONS'
+        'Access-Control-Allow-Methods': 'POST, OPTIONS',
       },
-      body: ''
+      body: '',
     };
   }
 
-  // Handle GET requests with a friendly message
+  // Gérer les requêtes GET avec un message convivial
   if (event.httpMethod === 'GET') {
     return {
       statusCode: 200,
       headers: {
-        'Content-Type': 'text/html'
+        'Content-Type': 'text/html',
       },
       body: `
         <html>
@@ -58,7 +61,7 @@ Content-Type: application/json
             </pre>
           </body>
         </html>
-      `
+      `,
     };
   }
 
@@ -68,8 +71,8 @@ Content-Type: application/json
       body: JSON.stringify({ error: 'Method not allowed' }),
       headers: {
         'Access-Control-Allow-Origin': '*',
-        'Content-Type': 'application/json'
-      }
+        'Content-Type': 'application/json',
+      },
     };
   }
 
@@ -83,12 +86,12 @@ Content-Type: application/json
         statusCode: 400,
         body: JSON.stringify({
           success: false,
-          error: 'Missing required fields'
+          error: 'Missing required fields',
         }),
         headers: {
           'Access-Control-Allow-Origin': '*',
-          'Content-Type': 'application/json'
-        }
+          'Content-Type': 'application/json',
+        },
       };
     }
 
@@ -97,7 +100,7 @@ Content-Type: application/json
       text: message,
       isUser: true,
       timestamp: new Date(timestamp || Date.now()),
-      sender
+      sender,
     });
 
     return {
@@ -105,8 +108,8 @@ Content-Type: application/json
       body: JSON.stringify(response),
       headers: {
         'Access-Control-Allow-Origin': '*',
-        'Content-Type': 'application/json'
-      }
+        'Content-Type': 'application/json',
+      },
     };
   } catch (error) {
     console.error('Webhook error:', error);
@@ -114,12 +117,12 @@ Content-Type: application/json
       statusCode: 500,
       body: JSON.stringify({
         success: false,
-        error: 'Internal server error'
+        error: 'Internal server error',
       }),
       headers: {
         'Access-Control-Allow-Origin': '*',
-        'Content-Type': 'application/json'
-      }
+        'Content-Type': 'application/json',
+      },
     };
   }
 };
