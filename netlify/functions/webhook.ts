@@ -1,8 +1,26 @@
+require('dotenv').config();
+
 import type { Handler } from '@netlify/functions';
+import { aiService } from '../../src/services/aiService';
 import { whatsappService } from '../../src/services/whatsappService';
 
+// Configuration pour les fonctions
+const config = {
+  openai: {
+    apiKey: process.env.VITE_OPENAI_API_KEY || '',
+  },
+  airtable: {
+    apiKey: process.env.VITE_AIRTABLE_API_KEY || '',
+    baseId: process.env.VITE_AIRTABLE_BASE_ID || '',
+  },
+  make: {
+    webhookUrl: process.env.VITE_MAKE_WEBHOOK_URL || '',
+    webhookSecret: process.env.MAKE_WEBHOOK_SECRET || '',
+  },
+};
+
 export const handler: Handler = async (event) => {
-  // Autoriser CORS pour Make.com
+  // Autoriser CORS
   if (event.httpMethod === 'OPTIONS') {
     return {
       statusCode: 200,
@@ -44,7 +62,6 @@ Content-Type: application/json
     };
   }
 
-  // Only allow POST requests for actual webhook handling
   if (event.httpMethod !== 'POST') {
     return {
       statusCode: 405,
@@ -61,7 +78,6 @@ Content-Type: application/json
     const body = JSON.parse(event.body || '{}');
     const { message, sender, timestamp } = body;
 
-    // Validate required fields
     if (!message || !sender) {
       return {
         statusCode: 400,
@@ -76,7 +92,6 @@ Content-Type: application/json
       };
     }
 
-    // Process the message
     const response = await whatsappService.handleIncomingMessage({
       id: Date.now().toString(),
       text: message,
@@ -107,4 +122,4 @@ Content-Type: application/json
       }
     };
   }
-}
+};
