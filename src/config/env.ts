@@ -1,3 +1,5 @@
+require('dotenv').config(); // Charger les variables d'environnement du fichier .env
+
 interface EnvConfig {
   openai: {
     apiKey: string;
@@ -14,15 +16,15 @@ interface EnvConfig {
 
 export const env: EnvConfig = {
   openai: {
-    apiKey: import.meta.env.VITE_OPENAI_API_KEY || '',
+    apiKey: process.env.VITE_OPENAI_API_KEY || '',
   },
   airtable: {
-    apiKey: import.meta.env.VITE_AIRTABLE_API_KEY || '',
-    baseId: import.meta.env.VITE_AIRTABLE_BASE_ID || '',
+    apiKey: process.env.VITE_AIRTABLE_API_KEY || '',
+    baseId: process.env.VITE_AIRTABLE_BASE_ID || '',
   },
   make: {
-    webhookUrl: import.meta.env.VITE_MAKE_WEBHOOK_URL || '',
-    webhookSecret: import.meta.env.MAKE_WEBHOOK_SECRET || '',
+    webhookUrl: process.env.VITE_MAKE_WEBHOOK_URL || '',
+    webhookSecret: process.env.MAKE_WEBHOOK_SECRET || '',
   },
 };
 
@@ -35,7 +37,7 @@ const requiredEnvVars = [
 ];
 
 const missingEnvVars = requiredEnvVars.filter(
-  (varName) => !import.meta.env[varName]
+  (varName) => !process.env[varName]
 );
 
 if (missingEnvVars.length > 0) {
